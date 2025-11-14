@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.35326.199
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FocusMod", "FocusMod.csproj", "{E8A347D1-054A-4C12-BB7C-467F67022169}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E8A347D1-054A-4C12-BB7C-467F67022169}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8A347D1-054A-4C12-BB7C-467F67022169}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8A347D1-054A-4C12-BB7C-467F67022169}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8A347D1-054A-4C12-BB7C-467F67022169}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8BF4F49B-378B-4B71-A71F-1FAC443FC814}
+	EndGlobalSection
+EndGlobal

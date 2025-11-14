@@ -1,25 +1,28 @@
-﻿using System;
-using System.Collections;
+﻿using CameraUtils.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
 namespace FocusMod {
-	class FocusMod : IInitializable, ITickable {
+    class FocusMod : IInitializable, ITickable {
 		const int HiddenHudLayer = 23;
 		const int NormalHudLayer = 5;
 
 		GameObject[] elementsToHide;
 
 		readonly AudioTimeSyncController audioTimeSyncController = null;
-		readonly IDifficultyBeatmap difficultyBeatmap = null;
-		readonly IReadonlyBeatmapData beatmapData = null;
+		readonly BeatmapLevel beatmapLevel = null;
+		readonly BeatmapKey beatmapKey;
+        readonly IReadonlyBeatmapData beatmapData = null;
 
-		public FocusMod(AudioTimeSyncController audioTimeSyncController, IDifficultyBeatmap difficultyBeatmap, IReadonlyBeatmapData beatmapData) {
+        public FocusMod(AudioTimeSyncController audioTimeSyncController, BeatmapLevel beatmapLevel, BeatmapKey beatmapKey, IReadonlyBeatmapData beatmapData) {
 			this.audioTimeSyncController = audioTimeSyncController;
-			this.difficultyBeatmap = difficultyBeatmap;
+			this.beatmapLevel = beatmapLevel;
+			this.beatmapKey = beatmapKey;
 			this.beatmapData = beatmapData;
 		}
 
@@ -127,22 +130,19 @@ namespace FocusMod {
 					return;
 			} catch { }
 
-			var njs = difficultyBeatmap.noteJumpMovementSpeed;
-			if(njs == 0)
-				njs = BeatmapDifficultyMethods.NoteJumpMovementSpeed(difficultyBeatmap.difficulty);
+            var info = beatmapLevel.GetDifficultyBeatmapData(beatmapKey.beatmapCharacteristic, beatmapKey.difficulty);
+            var njs = BeatmapDifficultyMethods.NoteJumpMovementSpeed(beatmapKey.difficulty, info.noteJumpMovementSpeed, false);
 
-			if(njs < PluginConfig.Instance.MinimumNjs)
+            if (njs < PluginConfig.Instance.MinimumNjs)
 				return;
 
 			ParseMap(beatmapData);
 
-			SharedCoroutineStarter.instance.StartCoroutine(InitStuff());
-		}
-
-		IEnumerator InitStuff() {
-			yield return null;
-
-			getElements();
+            _ = InitStuff();
+        }
+        async Task InitStuff() {
+			await Task.Yield();
+            getElements();
 
 			int HudToggle(int flag, bool show = true) => show ? flag | 1 << HiddenHudLayer : flag & ~(1 << HiddenHudLayer);
 
@@ -172,13 +172,22 @@ namespace FocusMod {
 		bool isVisible = true;
 
 		private void SetHudVisibility(bool visible) {
-			if(isVisible == visible)
+            if (isVisible == visible)
 				return;
 
-			isVisible = visible;
+            isVisible = visible;
 
 			foreach(var elem in elementsToHide)
-				elem.layer = visible ? 5 : HiddenHudLayer;
+			{
+				if (visible)
+				{
+                    VisibilityUtils.SetLayerRecursively(elem, VisibilityLayer.UI);
+                }
+				else
+				{
+                    VisibilityUtils.SetLayerRecursively(elem, VisibilityLayer.DesktopOnlyAndReflected);
+                }
+            }
 		}
 
 		public void Tick() {
@@ -190,11 +199,11 @@ namespace FocusMod {
 			if(isPaused && isVisible)
 				return;
 
-			if(lastTimespanIndex >= visibleTimespans.Length)
+            if (lastTimespanIndex >= visibleTimespans.Length)
 				return;
 
-			// If something rewound the time back we need to find a new start index
-			if(lastTimespanIndex != 0 && audioTimeSyncController.songTime < visibleTimespans[lastTimespanIndex - 1].end)
+            // If something rewound the time back we need to find a new start index
+            if (lastTimespanIndex != 0 && audioTimeSyncController.songTime < visibleTimespans[lastTimespanIndex - 1].end)
 				lastTimespanIndex = 0;
 
 			var intendedVisibility = false;
@@ -216,7 +225,7 @@ namespace FocusMod {
 				}
 			}
 
-			SetHudVisibility(intendedVisibility || (isPaused && PluginConfig.Instance.UnhideInPause));
+            SetHudVisibility(intendedVisibility || (isPaused && PluginConfig.Instance.UnhideInPause));
 		}
 	}
 }

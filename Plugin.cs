@@ -28,7 +28,11 @@ namespace FocusMod {
 
 		[OnStart]
 		public void OnApplicationStart() {
-			BSMLSettings.instance.AddSettingsMenu("Focus Mod", "FocusMod.Views.settings.bsml", PluginConfig.Instance);
+			BeatSaberMarkupLanguage.Util.MainMenuAwaiter.MainMenuInitializing += MainMenuInit;
 		}
+
+		public void MainMenuInit() {
+            BSMLSettings.Instance.AddSettingsMenu("Focus Mod", "FocusMod.Views.settings.bsml", PluginConfig.Instance);
+        }
 	}
 }
