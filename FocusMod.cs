@@ -1,5 +1,4 @@
-﻿using CameraUtils.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -179,14 +178,7 @@ namespace FocusMod {
 
 			foreach(var elem in elementsToHide)
 			{
-				if (visible)
-				{
-                    VisibilityUtils.SetLayerRecursively(elem, VisibilityLayer.UI);
-                }
-				else
-				{
-                    VisibilityUtils.SetLayerRecursively(elem, VisibilityLayer.DesktopOnlyAndReflected);
-                }
+                elem.layer = visible ? 5 : HiddenHudLayer;
             }
 		}
 
